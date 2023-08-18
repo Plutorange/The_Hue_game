@@ -1,6 +1,6 @@
 # The_Hue_game
 put the colors in correct order
-# WORKING!!!
+WORKING!!!
 
 Controls
 S - save current picture
