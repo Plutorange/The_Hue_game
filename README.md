@@ -14,6 +14,6 @@ LMB - swap colors (click on one color, then click on another to swap them)
 
 How to play:
 
-You have shuffled colors on your screen. You have to put them in correct order to make perfect gradient. Take each corner color as a guide, as they cannot be swapped. If you make full picture correctly your screen will become green for a second.
+You have shuffled colors on your screen. You have to put them in correct order to make perfect gradient. Take each corner color as a guide, as they cannot be swapped. If you make whole picture correctly your screen will become green for a second.
 
 working on improvement
