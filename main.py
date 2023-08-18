@@ -1,15 +1,14 @@
 import random
 import time
-
 import pygame
 
 
 class GameInfo:
-    pygame.init()
     pygame.display.set_caption('Gradient colors')
     size = 800, 800
     screen = pygame.display.set_mode(size)
-    pixel_size = 80
+    level_pixel_sizes = [200, 160, 100, 80, 50, 40, 32, 25, 20]
+    pixel_size = level_pixel_sizes[0]
     square_size = 800 // pixel_size
     pixels = []
     for i in range(square_size):
@@ -23,11 +22,11 @@ class Gradient:
               (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
               (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
               (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))]
+    solved_gradient = None
     selected1, selected2 = None, None
 
     @staticmethod
     def create_new_image():
-        GameInfo.pixel_size = 80
         GameInfo.square_size = 800 // GameInfo.pixel_size
         GameInfo.pixels = []
         for i in range(GameInfo.square_size):
@@ -79,6 +78,7 @@ class Gradient:
                     round(GameInfo.pixels[i][0][2] + (
                             GameInfo.pixels[i][GameInfo.square_size - 1][2] -
                             GameInfo.pixels[i][0][2]) / (GameInfo.square_size - 1) * j))
+        Gradient.solved_gradient = [i[::] for i in GameInfo.pixels]
 
     @staticmethod
     def shuffle():
@@ -121,6 +121,7 @@ class Game:
         Gradient.create_new_image()
         draw()
         shfl = False
+        solved = False
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -157,6 +158,7 @@ class Game:
                         pygame.image.save(GameInfo.screen, f'Gradient{time.time()}.png')
                     if event.key == pygame.K_r:
                         Gradient.create_new_image()
+                        solved = False
                         if shfl:
                             Gradient.shuffle()
                         draw()
@@ -168,7 +170,31 @@ class Game:
                         else:
                             pygame.display.set_mode(GameInfo.size)
                         draw()
+                    if event.key == pygame.K_1:
+                        print(1)
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[0]
+                    if event.key == pygame.K_2:
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[1]
+                    if event.key == pygame.K_3:
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[2]
+                    if event.key == pygame.K_4:
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[3]
+                    if event.key == pygame.K_5:
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[4]
+                    if event.key == pygame.K_6:
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[5]
+                    if event.key == pygame.K_7:
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[6]
+                    if event.key == pygame.K_8:
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[7]
+                    if event.key == pygame.K_9:
+                        GameInfo.pixel_size = GameInfo.level_pixel_sizes[8]
+            if solved is False and GameInfo.pixels == Gradient.solved_gradient:
+                solved = True
+                GameInfo.screen.fill((0, 255, 0))
+                pygame.display.flip()
+                pygame.time.delay(1000)
+                draw()
 
 
 Game.pygame_start()
-Gradient.create_new_image()
