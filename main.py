@@ -6,7 +6,9 @@ import pygame
 class GameInfo:
     pygame.display.set_caption('Gradient colors')
     size = 800, 800
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(size, pygame.RESIZABLE)
+    green_screen = pygame.Surface(size, pygame.SRCALPHA)
+    pygame.draw.rect(green_screen, (0, 255, 0, 100), (0, 0, 800, 800))
     level_pixel_sizes = [200, 160, 100, 80, 50, 40, 32, 25, 20]
     pixel_size = level_pixel_sizes[0]
     square_size = 800 // pixel_size
@@ -101,17 +103,20 @@ class Gradient:
 
 
 def draw():
+    GameInfo.screen.fill((0, 0, 0))
+    starting_point = [i // 2 - 400 for i in pygame.display.get_window_size()]
     for i in range(GameInfo.square_size):
         for j in range(GameInfo.square_size):
             pygame.draw.rect(GameInfo.screen, GameInfo.pixels[i][j], (
-                GameInfo.pixel_size * j, GameInfo.pixel_size * i, GameInfo.pixel_size,
-                GameInfo.pixel_size))
+                GameInfo.pixel_size * j + starting_point[0],
+                GameInfo.pixel_size * i + starting_point[1],
+                GameInfo.pixel_size, GameInfo.pixel_size))
     if Gradient.selected1:
         pygame.draw.rect(GameInfo.screen, Gradient.selected1[0], (
-            GameInfo.pixel_size * Gradient.selected1[1][1] - 10,
-            GameInfo.pixel_size * Gradient.selected1[1][0] - 10,
+            GameInfo.pixel_size * Gradient.selected1[1][1] - 10 + starting_point[0],
+            GameInfo.pixel_size * Gradient.selected1[1][0] - 10 + starting_point[1],
             GameInfo.pixel_size + 20, GameInfo.pixel_size + 20))
-    pygame.display.flip()
+    pygame.display.update()
 
 
 class Game:
@@ -120,9 +125,14 @@ class Game:
         GameInfo.screen.fill((71, 71, 71))
         Gradient.create_new_image()
         draw()
+        current_screen_size = pygame.display.get_window_size()
         shfl = False
         solved = False
+        show_accuracy = True
         while True:
+            if pygame.display.get_window_size() != current_screen_size:
+                current_screen_size = pygame.display.get_window_size()
+                draw()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -152,6 +162,7 @@ class Game:
                                         GameInfo.pixels[Gradient.selected1[1][0]][
                                             Gradient.selected1[1][1]]
                                 Gradient.selected1, Gradient.selected2 = None, None
+                                GameInfo.screen.fill((0, 0, 0))
                                 draw()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_s:
@@ -165,13 +176,11 @@ class Game:
                     if event.key == pygame.K_h:
                         shfl = not shfl
                     if event.key == pygame.K_f:
-                        if pygame.display.get_window_size() == GameInfo.size:
-                            pygame.display.set_mode(GameInfo.size, pygame.FULLSCREEN)
-                        else:
-                            pygame.display.set_mode(GameInfo.size)
+                        pygame.display.toggle_fullscreen()
                         draw()
+                    if event.key == pygame.K_c:
+                        show_accuracy = not show_accuracy
                     if event.key == pygame.K_1:
-                        print(1)
                         GameInfo.pixel_size = GameInfo.level_pixel_sizes[0]
                     if event.key == pygame.K_2:
                         GameInfo.pixel_size = GameInfo.level_pixel_sizes[1]
@@ -191,9 +200,14 @@ class Game:
                         GameInfo.pixel_size = GameInfo.level_pixel_sizes[8]
             if solved is False and GameInfo.pixels == Gradient.solved_gradient:
                 solved = True
-                GameInfo.screen.fill((0, 255, 0))
-                pygame.display.flip()
-                pygame.time.delay(1000)
+                if show_accuracy:
+                    GameInfo.screen.blit(GameInfo.green_screen,
+                                         (current_screen_size[0] // 2 - 400,
+                                          current_screen_size[1] // 2 - 400))
+                    pygame.display.update()
+                    pygame.time.delay(300)
+                    GameInfo.screen.fill((0, 0, 0))
+                    pygame.display.update()
                 draw()
 
 
